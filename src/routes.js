@@ -2,6 +2,7 @@ const routes = require('express').Router();
 const allocationModel = require('./model/allocation');
 const employeeModel = require('./model/employee');
 const deviceModel = require('./model/devices')
+const faceAPI = require('./services/faceAPI');
 
 function ResponseBuilder(result, message){
   let response = {
@@ -302,5 +303,22 @@ routes.delete('/device/:id', async (req, res) => {
   } catch (err) {
     res.status(500).send(ResponseBuilder(err, 'error'))
   }
+});
+
+
+
+routes.post('/recognize', (req, res) => {
+  // get face and recognize
+  faceAPI.recognizeFace(req.body.image, (err, result) => {
+    console.log(result);
+    res.send(result);
+  });
+})
+
+routes.post('/trainperson', (req, res) => {
+  faceAPI.registerFace(req.body.image, req.body.empId, (err, result) => {
+    console.log(result);
+    res.send(result);
+  });
 });
 module.exports = routes;
