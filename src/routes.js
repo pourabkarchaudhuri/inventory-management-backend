@@ -316,9 +316,13 @@ routes.post('/recognize', (req, res) => {
 })
 
 routes.post('/trainperson', (req, res) => {
-  faceAPI.registerFace(req.body.image, req.body.empId, (err, result) => {
+  faceAPI.registerFace(req.body.image, req.body.empId.toString(), (err, result) => {
     console.log(result);
-    res.send(result);
+    if (err) {
+      res.status(503).send(err);
+    } else {
+      res.send(result);
+    }
   });
 });
 module.exports = routes;

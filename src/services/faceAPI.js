@@ -6,7 +6,7 @@ module.exports = {
             if (err) {
                 console.log('error returned from DETECT API' + err);
                 cb({
-                    status: 400,
+                    status: 503,
                     error: 'There is error from face API',
                     message: err
 
@@ -16,7 +16,7 @@ module.exports = {
                     // there are no face in image at all render camera capture page again
                     console.log("No face at all");
                     cb({
-                        status: 400,
+                        status: 503,
                         error: 'no face is there in image',
                         message: err
 
@@ -24,7 +24,7 @@ module.exports = {
                 } else if (rekData.length > 1) {
                     console.log("More than one face in image");
                     cb({
-                        status: 400,
+                        status: 503,
                         error: 'there are more than one face in image',
                         message: error
                     }, null);
@@ -34,7 +34,7 @@ module.exports = {
                         if (error) {
                             console.log(error);
                             cb({
-                                status: 400,
+                                status: 503,
                                 error: "There is error from face API",
                                 message: error,
 
@@ -44,7 +44,7 @@ module.exports = {
                                 //there is a photo but person is not identified or not trained, render OTP page.
                                 console.log('person is not registered');
                                 cb({
-                                    status: 400,
+                                    status: 503,
                                     error: 'person not registered or There is error from face API',
                                     message: err
 
@@ -56,7 +56,7 @@ module.exports = {
                                     if (faceError) {
                                         console.log(faceError);
                                         cb({
-                                            status: 400,
+                                            status: 503,
                                             error: 'There is error from face API',
                                             message: err
 
@@ -79,18 +79,19 @@ module.exports = {
     "registerFace": (imageData, empId, cb) => {
         azureHandler.detect(imageData, (err, rekData) => {
             if (err) {
-                console.log('error returned from DETECT API' + err);
+                console.log('error returned from DETECT API' + JSON.stringify(err));
                 cb({
-                    status: 400,
+                    status: 503,
                     error: 'There is error from face API',
                     message: err
                 }, null);
             } else {
+                console.log(rekData);
                 azureHandler.identify(rekData[0].faceId, (error, identifyResult) => {
                     console.log(identifyResult);
                     if (error) {
                         cb({
-                            status: 400,
+                            status: 503,
                             error: "There is error from face API",
                             message: error,
                         }, null);
@@ -100,16 +101,16 @@ module.exports = {
                                 if (err) {
                                     console.log(`Error in indexing face of ${empId}`, err);
                                     cb({
-                                        status: 400,
+                                        status: 503,
                                         error: 'There is error from face API',
                                         message: err
                                     }, null);
                                 } else {
-                                    azureHandler.addFace(req.body.imageData, data.personId, (error, result) => {
+                                    azureHandler.addFace(imageData, data.personId, (error, result) => {
                                         if (error) {
                                             console.log(`Error in indexing face of ${empId}`, error);
                                             cb({
-                                                status: 400,
+                                                status: 503,
                                                 error: 'There is error from face API',
                                                 message: error
                                             }, null);
@@ -120,7 +121,7 @@ module.exports = {
                                                 if (trainError) {
                                                     console.log(`Error in Training`, JSON.stringify(trainError));
                                                     cb({
-                                                        status: 400,
+                                                        status: 503,
                                                         error: 'There is error in training.',
                                                         message: err
                                                     }, null);
@@ -135,7 +136,7 @@ module.exports = {
                                         } else {
                                             console.log('error');
                                             cb({
-                                                status: 400,
+                                                status: 503,
                                                 error: 'There is error in face API.',
                                                 message: err
                                             }, null);
@@ -149,7 +150,7 @@ module.exports = {
                                 if (error) {
                                     console.log(`Error in indexing face of ${empId}`, error);
                                     cb({
-                                        status: 400,
+                                        status: 503,
                                         error: 'There is error in face API.',
                                         message: err
                                     }, null);
@@ -158,7 +159,7 @@ module.exports = {
                                         if (trainError) {
                                             console.log(`Error in Training`, JSON.stringify(trainError));
                                             cb({
-                                                status: 400,
+                                                status: 503,
                                                 error: 'There is error in training.',
                                                 message: err
                                             }, null);
