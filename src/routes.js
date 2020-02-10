@@ -54,6 +54,7 @@ routes.post('/allocate', async (req, res) => {
         let deviceToBeAllocated = await deviceModel.find({serialNumber:req.body.serialNumber, isAllocated:false});
         let employeeToWhomAllocated = await employeeModel.find({employeeId:req.body.employeeId});
         // console.log(deviceToBeAllocated)
+        console.log("Device to be Allocated : " + JSON.stringify(deviceToBeAllocated))
         
         if(deviceToBeAllocated.length == 0){
           res.status(404).send(ResponseBuilder(null, `The device with serial number ${req.body.serialNumber} is not available for allocation`));
@@ -97,11 +98,14 @@ routes.post('/deallocate', async (req, res) => {
 
   try {
       //Search devices by serial number and employee with empId
-      let allocationDetails = await allocationModel.find({serialNumber:req.body.serialNumber})
+      let allocationDetails = await allocationModel.find({serialNumber:req.body.serialNumber, allocatedStatus: true})
       let deviceToBeAllocated = await deviceModel.find({serialNumber:req.body.serialNumber, isAllocated:true});
       let employeeToWhomAllocated = await employeeModel.find({employeeId:req.body.employeeId});
       // console.log(deviceToBeAllocated)
-      
+      // console.log("Allocated Details : " + JSON.stringify(allocationDetails))
+      // console.log("Device to be De-Allocated : " + JSON.stringify(deviceToBeAllocated))
+      // console.log("Employee to whom allocated : " + JSON.stringify(employeeToWhomAllocated))
+
       if(deviceToBeAllocated.length == 0){
         res.status(404).send(ResponseBuilder(null, `The device with serial number ${req.body.serialNumber} is not allocated currently with employeeId ${employeeToWhomAllocated[0].employeeId}`));
       }
