@@ -3,6 +3,10 @@ const allocationModel = require('./model/allocation');
 const employeeModel = require('./model/employee');
 const deviceModel = require('./model/devices')
 const faceAPI = require('./services/faceAPI');
+const mailHandler = require('./services/mailer')
+
+require('dotenv').config();
+
 
 function ResponseBuilder(result, message){
   let response = {
@@ -79,6 +83,17 @@ routes.post('/allocate', async (req, res) => {
             //Save payload to allocation Collection
             await allocatedDevices.save();
             console.log("Sending mail...")
+            //Send Mail
+
+            
+
+            const mailerService =  new mailHandler();
+
+            let msg = `Hi ${employeeToWhomAllocated[0].employeeName},<br><br>Device <b>${deviceToBeAllocated[0].deviceName}</b> with serial number <b>${deviceToBeAllocated[0].serialNumber}</b> is allocated to you.<br><br>Remember to deallocate by EOD!<br><br>Thanks,<br>YODA - Device Manager`
+
+            mailerService.Sendmail(employeeToWhomAllocated[0].email, process.env.MANAGER, msg, 'Device Allocation Alert', (err, result) => {
+                console.log(`Mail sent : ${JSON.stringify(result)}`)
+            })
             res.status(200).send(ResponseBuilder(allocatedDevices, `Device ${deviceToBeAllocated[0].deviceName} with serial number ${deviceToBeAllocated[0].serialNumber} is allocated to employeeID ${req.body.employeeId}`));
           }
           
@@ -127,6 +142,12 @@ routes.post('/deallocate', async (req, res) => {
           //Save payload to allocation Collection
           // await allocatedDevices.save();
           console.log("Sending mail...")
+          const mailerService =  new mailHandler();
+          let msg = `Hi ${employeeToWhomAllocated[0].employeeName},<br><br>Device <b>${deviceToBeAllocated[0].deviceName}</b> with serial number <b>${deviceToBeAllocated[0].serialNumber}</b> is deallocated from you.<br><br>Thanks,\nYODA - Device Manager`
+
+          mailerService.Sendmail(employeeToWhomAllocated[0].email, process.env.MANAGER, msg, 'Device Deallocation Alert', (err, result) => {
+              console.log(`Mail sent : ${JSON.stringify(result)}`)
+          })
           res.status(200).send(ResponseBuilder(null, `Device ${deviceToBeAllocated[0].deviceName} with serial number ${deviceToBeAllocated[0].serialNumber} is deallocated from employeeID ${req.body.employeeId}`));
         }
         

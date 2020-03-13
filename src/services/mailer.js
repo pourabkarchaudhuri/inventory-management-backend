@@ -1,8 +1,18 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config()
+require('dotenv').config();
 
+console.log("Sender ID : ", process.env.MAILER_ID);
+
+class mailer{
+  
+    constructor(){
+  
+        console.log("Intializing mailer service")
+  
+    }
+  
     Sendmail(receivers,ccReceivers,msg,sub,callback){
- 
+  
         var transporter = nodemailer.createTransport({
             service: 'outlook',
             auth: {
@@ -10,27 +20,31 @@ require('dotenv').config()
                     pass: process.env.MAILER_PASSWORD,
                 }
             });
- 
+  
         let mailOptions = {
-            from: '"Inventory Engine Service"', 
+            from: '"DEVICE MANAGER" <'+ process.env.MAILER_ID +'>', 
             to: receivers, 
             subject: sub, 
-            cc:'lohitkumarb@hexaware.com',
+            cc:ccReceivers,
             html:msg,
         };
         
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log("ERROR: " + error);
-            // logger.error(`Error sending mail to ${receivers}`+error);
+            console.log(`Error sending mail to ${receivers}`+error);
             callback(error,null)
             
             }else{
-                // logger.info(`Mail sent to ${receivers}`+ info.messageId+ " " + info.response);
+                console.log(`Mail sent to ${receivers}`+ info.messageId+ " " + info.response);
                 callback(null,info)
                 
             }
         });
           
- 
+  
     }
+  
+}
+  
+module.exports = mailer;
